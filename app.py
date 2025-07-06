@@ -1,13 +1,18 @@
+import os
+
 import google.generativeai as genai
+from dotenv import load_dotenv
 from elevenlabs import ElevenLabs, save
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 
-genai.configure(api_key="AIzaSyB5qRu7RPEaj6gSNiuagVvX28VkN-eX9DI")
+load_dotenv()
+
+genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
 elevenlabs = ElevenLabs(
-    api_key="sk_d2c0ca5df7924c1cb2dbe95cfb629f03742ee57c91b24e15",
+    api_key=os.getenv("ELEVEN_API_KEY"),
 )
 
 modelo = genai.GenerativeModel("gemma-3n-e2b-it")
