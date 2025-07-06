@@ -3,7 +3,7 @@ import os
 import google.generativeai as genai
 from dotenv import load_dotenv
 from elevenlabs import ElevenLabs, save
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
@@ -38,7 +38,8 @@ chat = modelo.start_chat(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://bem-delta.vercel.app"],
+    allow_origins=["https://bem-delta.vercel.app", "http://localhost:3000"],
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -56,12 +57,16 @@ def perguntar(dados: Pergunta):
 
 @app.post("/falar")
 def falar(dados: Pergunta):
-    audio = elevenlabs.text_to_speech.convert(
-        text=dados.texto,
-        voice_id="SAz9YHcvj6GT2YYXdXww",
-        model_id="eleven_multilingual_v2",
-        output_format="mp3_44100_128",
-    )
-    caminho = "resposta.mp3"
-    save(audio, caminho)
-    return FileResponse(caminho, media_type="audio/mpeg")
+    try:
+        audio = elevenlabs.text_to_speech.convert(
+            text=dados.texto,
+            voice_id="SAz9YHcvj6GT2YYXdXww",
+            model_id="eleven_multilingual_v2",
+            output_format="mp3_44100_128",
+        )
+        caminho = "resposta.mp3"
+        save(audio, caminho)
+        return FileResponse(caminho, media_type="audio/mpeg")
+    except Exception as e:
+        print("Erro ao gerar áudio:", e)
+        raise HTTPException(status_code=500, detail="Erro ao gerar áudio.")
