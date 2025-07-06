@@ -38,7 +38,7 @@ chat = modelo.start_chat(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # To:do Colocar domínio Next.js
+    allow_origins=["https://bem-delta.vercel.app"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
